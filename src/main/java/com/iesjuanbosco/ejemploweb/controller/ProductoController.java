@@ -2,15 +2,18 @@ package com.iesjuanbosco.ejemploweb.controller;
 
 import com.iesjuanbosco.ejemploweb.entity.Producto;
 import com.iesjuanbosco.ejemploweb.repository.ProductoRepository;
+import jakarta.validation.Valid;
 import org.hibernate.query.NativeQuery;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.model.IModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //Para que Spring sepa que esta clase es un controlador tenemos que añadir la anotación @Controller antes de la clase
 @Controller
@@ -30,9 +33,103 @@ public class ProductoController {
         List<Producto> productos = this.productoRepository.findAll();
 
         //Pasamos los datos a la vista
-        model.addAttribute("producto",productos);
+        model.addAttribute("productos",productos);
 
         return "producto-list";
+    }
+
+    //borra un producto a partir de la ruta
+    @GetMapping("/productos/del/{id}")
+    public String Delete(@PathVariable Long id){
+
+        //Borrar el producto usando el repositorio
+        productoRepository.deleteById(id);
+        //redirigir al listado de productos
+        return "redirect: /productos";
+    }
+
+    //---------------------------------------------
+    //por get muestra la vista
+    @GetMapping("/productos/new")
+    public String newProducto(){
+
+        //redirigir al listado de productos
+        return "producto-new";
+    }
+    //por post para mandar los datos
+    @PostMapping("/productos/new")
+    public String newProductoInsert(@Valid Producto producto, BindingResult bindingResult, Model model)
+    {
+        //Si hay errores de validacion volvemos a mostrar el formulario
+        if (bindingResult.hasErrors()) {
+
+            return "producto-new";
+        }
+
+        productoRepository.save(producto);
+        //redirigir al listado de productos
+        return "redirect:/productos";
+    }
+
+
+
+    //----------------------------------------------
+
+    //por get muestra la vista
+    @GetMapping("/productos/edit/{id}")
+    public String editProducto(@PathVariable Long id, Model model){
+        //optional para contemplar la posibilidad de que no exista producto con ese id
+        // además el optional contiene metodos como el isPresent
+        Optional<Producto> producto = productoRepository.findById(id);
+        if(producto.isPresent()){
+
+            //para pasarle a la vista el objeto
+            model.addAttribute("producto",producto.get());
+            return "producto-edit";
+        }
+
+        //redirigir al listado de productos
+        return "redirect:/productos";
+    }
+
+    //por post para mandar los datos
+    @PostMapping("/productos/edit/{id}")
+    public String editProductoUpdate(@PathVariable Long id ,Producto producto)
+    {
+        producto.setId(id);
+        productoRepository.save(producto);
+        //redirigir al listado de productos
+        return "redirect:/productos";
+    }
+    //----------------------------------------------
+
+
+
+
+
+
+
+    @GetMapping("/productos/upd/{id}")
+    public String Update(@PathVariable Long id){
+
+        //Borrar el producto usando el repositorio
+        productoRepository.deleteById(id);
+        //redirigir al listado de productos
+        return "redirect: /productos";
+    }
+    @GetMapping("/productos/sel/{id}")
+    public String Select(@PathVariable Long id, Model model){
+        List<Producto> productos = new ArrayList<Producto>();
+        Producto pid = new Producto();
+
+        //Borrar el producto usando el repositorio
+        pid = productoRepository.getReferenceById(id);
+        productos.add(pid);
+        //redirigir al listado de productos
+        //Pasamos los datos a la vista
+        model.addAttribute("productos",productos);
+        return "redirect: /productos";
+
     }
 
     @GetMapping("/productos/add")

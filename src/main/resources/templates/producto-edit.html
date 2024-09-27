@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insertar un nuevo producto</title>
+</head>
+<body>
+<form th:action="@{/productos/edit/{id}(id=${producto.id})}" method="POST"  th:object="${producto}">
+    <input type="text" placeholder="Titulo..." id="titulo" name="titulo" th:value="${producto.titulo}" required><br>
+    <input type="text" placeholder="Cantidad..." id="cantidad" name="cantidad" th:value="${producto.cantidad}" required><br>
+    <input type="number" min="0" step="0.01" placeholder="Precio..." id="precio" name="precio" th:value="${producto.precio}" required><br>
+    <input type="submit" value="editar"><br>
+</form>
+
+</body>
+</html>
+
